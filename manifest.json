@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Site Blocker",
+  "name": "IRLMode",
   "version": "1.1",
   "description": "Dynamically blocks websites with overlay and timer",
   "permissions": ["storage", "scripting", "tabs"],

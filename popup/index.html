@@ -9,99 +9,353 @@
         src: url("/fonts/Chillax-Variable.ttf") format("opentype");
       }
 
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:        #0d0d0d;
+        --surface:   #161616;
+        --surface2:  #1e1e1e;
+        --border:    #2a2a2a;
+        --accent:    #4f8ef7;
+        --accent-h:  #6fa4ff;
+        --danger:    #f25d5d;
+        --danger-h:  #ff7a7a;
+        --text:      #e8e8e8;
+        --text-muted:#6b7280;
+        --radius:    10px;
+      }
+
       body {
-        font-family: sans-serif;
-        padding: 10px;
-        width: 270px;
-        background: #008cff; /* Bright blue */
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        width: 320px;
+        min-height: 100px;
+        padding: 0 0 12px;
+        overflow-x: hidden;
       }
 
-      h1 {
-        margin-bottom: 10px;
-        text-align: center;
-        font-family: "Chillax-Variable", sans-serif;
-        font-size: 30px;
-        font-weight: 600;
-      }
-
-      h3 {
-        margin: 5px 0 0 0;
-        font-family: "Chillax-Variable", sans-serif;
-        font-size: 20px;
-        font-weight: 500;
-      }
-
-      input,
-      button {
-        width: 90%;
-        margin-top: 10px;
-        padding: 5px;
-        border-radius: 5px;
-        border: 2px solid black;
-        box-shadow: 4px 4px 0px black;
-        outline: none;
-      }
-
-      input#siteInput {
-        width: 50%;
-      }
-
-      select {
-        width: 40%;
-        margin-left: 5px;
-        border-radius: 5px;
-      }
-
-      ul {
-        padding-left: 20px;
-      }
-
-      li {
-        font-size: 14px;
-      }
-
-      .remove {
-        color: red;
-        cursor: pointer;
-        float: right;
-      }
-
-      #scrollableList {
-        max-height: 200px; /* Adjust based on your popup height */
-        overflow-y: auto;
-        background-color: white;
-        border: 2px solid black;
-        border-radius: 5px;
-        padding: 5px;
-        margin-top: 10px;
-        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
-      }
-
-      #siteList {
-        list-style: none;
-        padding-left: 0;
-        margin: 0;
-      }
-
-      #siteList li {
-        margin-bottom: 5px;
+      /* ── Header ── */
+      .header {
         display: flex;
-        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .header svg { flex-shrink: 0; }
+      .header-text h1 {
+        font-family: "Chillax-Variable", 'Segoe UI', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.3px;
+        line-height: 1;
+      }
+      .header-text p {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* ── Form ── */
+      .form-section {
+        padding: 14px 16px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
         align-items: center;
       }
+
+      label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: var(--radius);
+        padding: 8px 10px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        width: 100%;
+        font-family: inherit;
+      }
+      input[type="text"]::placeholder,
+      input[type="number"]::placeholder { color: var(--text-muted); }
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+      }
+      select option { background: var(--surface2); }
+
+      /* mode + site row */
+      #siteInput  { flex: 1; }
+      #modeSelect { width: 116px; flex-shrink: 0; }
+
+      /* timer row */
+      .timer-row {
+        display: flex;
+        gap: 8px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.2s ease;
+      }
+      .timer-row.visible {
+        max-height: 60px;
+        opacity: 1;
+      }
+      .timer-row .field { flex: 1; }
+
+      /* block button */
+      #blockButton {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        padding: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.15s, transform 0.1s;
+        font-family: inherit;
+        letter-spacing: 0.2px;
+      }
+      #blockButton:hover  { background: var(--accent-h); }
+      #blockButton:active { transform: scale(0.98); }
+
+      /* ── Divider ── */
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── Blocked list toolbar ── */
+      .list-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px 8px;
+      }
+      .badge {
+        font-size: 11px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: var(--text-muted);
+      }
+      #toggleReveal {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 6px;
+        padding: 4px 9px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      #toggleReveal:hover { border-color: var(--accent); color: var(--accent); }
+
+      /* ── Scrollable list ── */
+      #scrollableList {
+        max-height: 190px;
+        overflow-y: auto;
+        margin: 0 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      #scrollableList::-webkit-scrollbar       { width: 4px; }
+      #scrollableList::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+      #siteList { list-style: none; }
+
+      .site-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.12s;
+      }
+      .site-item:last-child  { border-bottom: none; }
+      .site-item:hover       { background: var(--surface2); }
+
+      .site-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: rgba(79,142,247,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 13px;
+      }
+
+      .site-info { flex: 1; min-width: 0; }
+      .site-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .site-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 1px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .mode-pill {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+      .mode-pill.permanent {
+        background: rgba(79,142,247,0.15);
+        color: var(--accent);
+        border: 1px solid rgba(79,142,247,0.3);
+      }
+      .mode-pill.timer {
+        background: rgba(251,191,36,0.12);
+        color: #f59e0b;
+        border: 1px solid rgba(251,191,36,0.3);
+      }
+
+      .remove-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.15s, background 0.15s;
+        flex-shrink: 0;
+      }
+      .remove-btn:hover { color: var(--danger); background: rgba(242,93,93,0.1); }
+
+      /* ── Empty state ── */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 16px;
+        color: var(--text-muted);
+        gap: 8px;
+        font-size: 13px;
+        text-align: center;
+      }
+      .empty-state svg { opacity: 0.4; }
     </style>
   </head>
   <body>
-    <h1>Site Blocker</h1>
-    <input id="siteInput" placeholder="example.com" />
-    <select id="modeSelect">
-      <option value="permanent">Permanent</option>
-      <option value="timer">Timer</option>
-    </select>
-    <h3>Timer:</h3>
-    <input id="minutesInput" type="number" placeholder="Minutes" />
-    <input id="secondsInput" type="number" placeholder="Seconds" />
-    <button id="blockButton">Block Site</button>
+
+    <!-- Header -->
+    <div class="header">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z" fill="#4f8ef7" opacity="0.9"/>
+        <path d="M10 14l-2-2 1.4-1.4L10 11.2l4.6-4.6L16 8l-6 6z" fill="white"/>
+      </svg>
+      <div class="header-text">
+        <h1>Site Blocker</h1>
+        <p>Manage your blocked domains</p>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-section">
+      <div>
+        <label for="siteInput">Domain</label>
+        <div class="input-row">
+          <input id="siteInput" type="text" placeholder="e.g. reddit.com" />
+          <select id="modeSelect">
+            <option value="permanent">Permanent</option>
+            <option value="timer">Timer</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="timer-row" id="timerRow">
+        <div class="field">
+          <label for="hoursInput">Hours</label>
+          <input id="hoursInput" type="number" placeholder="0" min="0" />
+        </div>
+        <div class="field">
+          <label for="minutesInput">Minutes</label>
+          <input id="minutesInput" type="number" placeholder="0" min="0" max="59" />
+        </div>
+        <div class="field">
+          <label for="secondsInput">Seconds</label>
+          <input id="secondsInput" type="number" placeholder="0" min="0" max="59" />
+        </div>
+      </div>
+
+      <button id="blockButton">
+        Block Site
+      </button>
+    </div>
+
+    <!-- Blocked List -->
+    <div class="divider">Blocked Sites</div>
+    <div class="list-toolbar">
+      <span class="badge" id="countBadge">0 sites</span>
+      <button id="toggleReveal">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        Reveal names
+      </button>
+    </div>
+
     <div id="scrollableList">
       <ul id="siteList"></ul>
     </div>
