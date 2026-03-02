@@ -10,6 +10,21 @@ const timerRow     = document.getElementById("timerRow");
 const toggleReveal = document.getElementById("toggleReveal");
 const countBadge   = document.getElementById("countBadge");
 
+// ── Modal refs ─────────────────────────────────────────────────────────────────
+const passwordOverlay      = document.getElementById("passwordOverlay");
+const passwordInput        = document.getElementById("passwordInput");
+const passwordConfirmInput = document.getElementById("passwordConfirmInput");
+const passwordModalTitle   = document.getElementById("passwordModalTitle");
+const passwordModalSub     = document.getElementById("passwordModalSubtitle");
+const passwordError        = document.getElementById("passwordError");
+const passwordCancel       = document.getElementById("passwordCancel");
+const passwordConfirm      = document.getElementById("passwordConfirm");
+
+const deleteOverlay  = document.getElementById("deleteOverlay");
+const deleteModalBody = document.getElementById("deleteModalBody");
+const deleteCancel   = document.getElementById("deleteCancel");
+const deleteConfirm  = document.getElementById("deleteConfirm");
+
 let showNames = false;
 let tickInterval = null;
 
@@ -21,17 +36,7 @@ modeSelect.addEventListener("change", () => {
 // ── Reveal / hide names ───────────────────────────────────────────────────────
 toggleReveal.addEventListener("click", () => {
   if (!showNames) {
-    if (confirm("Are you sure you want to reveal the blocked site names?")) {
-      showNames = true;
-      toggleReveal.innerHTML = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>
-        Hide names`;
-      loadBlockedSites();
-    }
+    openPasswordModal();
   } else {
     showNames = false;
     toggleReveal.innerHTML = `
@@ -42,6 +47,114 @@ toggleReveal.addEventListener("click", () => {
       Reveal names`;
     loadBlockedSites();
   }
+});
+
+// ── Password modal logic ───────────────────────────────────────────────────────
+let _isSettingPassword = false;
+
+function closePasswordModal() {
+  passwordOverlay.classList.remove("active");
+  passwordInput.value = "";
+  passwordConfirmInput.value = "";
+  passwordError.textContent = "";
+  passwordConfirmInput.style.display = "none";
+  passwordModalTitle.textContent = "Enter Password";
+  passwordModalSub.textContent = "Enter your password to reveal the blocked site names.";
+  passwordConfirm.textContent = "Unlock";
+  _isSettingPassword = false;
+}
+
+function openPasswordModal() {
+  chrome.storage.local.get(["revealPassword"], (data) => {
+    passwordInput.value = "";
+    passwordConfirmInput.value = "";
+    passwordError.textContent = "";
+
+    if (!data.revealPassword) {
+      // First time — prompt user to set a password
+      _isSettingPassword = true;
+      passwordModalTitle.textContent = "Set a Password";
+      passwordModalSub.textContent = "No password set yet. Create one to protect the blocked site names.";
+      passwordConfirmInput.style.display = "block";
+      passwordConfirm.textContent = "Set Password";
+    } else {
+      _isSettingPassword = false;
+      passwordModalTitle.textContent = "Enter Password";
+      passwordModalSub.textContent = "Enter your password to reveal the blocked site names.";
+      passwordConfirmInput.style.display = "none";
+      passwordConfirm.textContent = "Unlock";
+    }
+
+    passwordOverlay.classList.add("active");
+    setTimeout(() => passwordInput.focus(), 80);
+  });
+}
+
+passwordCancel.addEventListener("click", closePasswordModal);
+
+passwordOverlay.addEventListener("click", (e) => {
+  if (e.target === passwordOverlay) closePasswordModal();
+});
+
+function submitPassword() {
+  const val = passwordInput.value;
+
+  if (_isSettingPassword) {
+    // Setting a new password
+    if (val.length < 4) {
+      passwordError.textContent = "Password must be at least 4 characters.";
+      return;
+    }
+    if (val !== passwordConfirmInput.value) {
+      passwordError.textContent = "Passwords do not match.";
+      passwordConfirmInput.value = "";
+      passwordConfirmInput.focus();
+      return;
+    }
+    chrome.storage.local.set({ revealPassword: val }, () => {
+      showNames = true;
+      closePasswordModal();
+      toggleReveal.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        Hide names`;
+      loadBlockedSites();
+    });
+  } else {
+    // Verifying existing password
+    chrome.storage.local.get(["revealPassword"], (data) => {
+      if (val === data.revealPassword) {
+        showNames = true;
+        closePasswordModal();
+        toggleReveal.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+          Hide names`;
+        loadBlockedSites();
+      } else {
+        passwordError.textContent = "Incorrect password. Try again.";
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    });
+  }
+}
+
+passwordConfirm.addEventListener("click", submitPassword);
+passwordInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    if (_isSettingPassword) passwordConfirmInput.focus();
+    else submitPassword();
+  }
+});
+passwordConfirmInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") submitPassword();
 });
 
 // ── Normalise a user-supplied domain string ───────────────────────────────────
@@ -143,7 +256,7 @@ function loadBlockedSites() {
       removeBtn.title = "Remove";
       removeBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
       removeBtn.addEventListener("click", () => {
-        if (confirm(`Remove "${entry.site}" from the block list?`)) {
+        openDeleteModal(entry.site, () => {
           const updated = [...blocked];
           updated.splice(index, 1);
           chrome.storage.sync.set({ blocked: updated }, () => {
@@ -152,7 +265,7 @@ function loadBlockedSites() {
               if (tabs[0]?.id) chrome.tabs.reload(tabs[0].id);
             });
           });
-        }
+        });
       });
 
       li.append(icon, info, pill, removeBtn);
@@ -180,6 +293,35 @@ function loadBlockedSites() {
     }
   });
 }
+
+// ── Delete confirmation modal logic ───────────────────────────────────────────
+let _pendingDeleteCallback = null;
+
+function openDeleteModal(siteName, onConfirm) {
+  if (showNames) {
+    deleteModalBody.innerHTML = `Are you sure you want to remove <strong style="color:var(--danger)">${siteName}</strong> from the block list?`;
+  } else {
+    deleteModalBody.textContent = "Are you sure you want to remove this site from the block list?";
+  }
+  _pendingDeleteCallback = onConfirm;
+  deleteOverlay.classList.add("active");
+}
+
+function closeDeleteModal() {
+  deleteOverlay.classList.remove("active");
+  _pendingDeleteCallback = null;
+}
+
+deleteCancel.addEventListener("click", closeDeleteModal);
+
+deleteOverlay.addEventListener("click", (e) => {
+  if (e.target === deleteOverlay) closeDeleteModal();
+});
+
+deleteConfirm.addEventListener("click", () => {
+  if (_pendingDeleteCallback) _pendingDeleteCallback();
+  closeDeleteModal();
+});
 
 // ── Add a site ────────────────────────────────────────────────────────────────
 function addSite() {

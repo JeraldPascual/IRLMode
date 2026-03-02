@@ -297,6 +297,123 @@
         text-align: center;
       }
       .empty-state svg { opacity: 0.4; }
+
+      /* ── Modals ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px 18px 16px;
+        width: 280px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        transform: translateY(6px) scale(0.97);
+        transition: transform 0.18s ease;
+      }
+      .modal-overlay.active .modal {
+        transform: translateY(0) scale(1);
+      }
+      .modal-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+      }
+      .modal-icon.lock { background: rgba(79,142,247,0.15); color: var(--accent); }
+      .modal-icon.danger { background: rgba(242,93,93,0.15); color: var(--danger); }
+      .modal h2 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        text-align: center;
+        margin-bottom: 4px;
+      }
+      .modal p {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-bottom: 14px;
+        line-height: 1.5;
+      }
+      .modal p strong {
+        color: var(--danger);
+        font-weight: 600;
+      }
+      .modal input[type="password"] {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: var(--radius);
+        padding: 8px 10px;
+        font-size: 13px;
+        outline: none;
+        width: 100%;
+        font-family: inherit;
+        margin-bottom: 6px;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .modal input[type="password"]::placeholder { color: var(--text-muted); }
+      .modal input[type="password"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+      }
+      .modal-error {
+        font-size: 11px;
+        color: var(--danger);
+        text-align: center;
+        min-height: 16px;
+        margin-bottom: 10px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .modal-actions button {
+        flex: 1;
+        padding: 8px;
+        border-radius: var(--radius);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        border: none;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .modal-actions button:active { transform: scale(0.97); }
+      .btn-cancel {
+        background: var(--surface2);
+        border: 1px solid var(--border) !important;
+        color: var(--text-muted);
+      }
+      .btn-cancel:hover { border-color: var(--accent) !important; color: var(--accent); }
+      .btn-confirm-lock {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-confirm-lock:hover { background: var(--accent-h); }
+      .btn-confirm-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-confirm-danger:hover { background: var(--danger-h); }
     </style>
   </head>
   <body>
@@ -358,6 +475,48 @@
 
     <div id="scrollableList">
       <ul id="siteList"></ul>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal-overlay" id="passwordOverlay">
+      <div class="modal">
+        <div class="modal-icon lock">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h2 id="passwordModalTitle">Enter Password</h2>
+        <p id="passwordModalSubtitle">Enter your password to reveal the blocked site names.</p>
+        <input type="password" id="passwordInput" placeholder="Password" autocomplete="off" />
+        <input type="password" id="passwordConfirmInput" placeholder="Confirm password" autocomplete="off" style="display:none; margin-top:6px;" />
+        <div class="modal-error" id="passwordError"></div>
+        <div class="modal-actions">
+          <button class="btn-cancel" id="passwordCancel">Cancel</button>
+          <button class="btn-confirm-lock" id="passwordConfirm">Unlock</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteOverlay">
+      <div class="modal">
+        <div class="modal-icon danger">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/>
+            <path d="M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+        </div>
+        <h2>Remove Site?</h2>
+        <p id="deleteModalBody">Are you sure you want to remove this site from the block list?</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" id="deleteCancel">Cancel</button>
+          <button class="btn-confirm-danger" id="deleteConfirm">Remove</button>
+        </div>
+      </div>
     </div>
 
     <script src="popup.js"></script>
