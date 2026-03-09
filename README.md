@@ -1,6 +1,20 @@
+<div align="center">
+
+<img src="./icons/icon120.png" alt="IRLMode Icon" width="120"/>
+
 # IRLMode
 
-Another site blocker and  lightweight Manifest V3 Chrome extension that blocks any website with a full-page overlay. Supports permanent blocking and timer-based blocking with live countdown. No external dependencies, no backend — everything runs locally using the Chrome Extension APIs.
+**Another site blocker extension but takes you IRL**
+
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?logo=googlechrome&logoColor=white)](https://chrome.google.com/webstore)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-brightgreen)](https://developer.chrome.com/docs/extensions/mv3/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-57.4%25-F7DF1E?logo=javascript&logoColor=black)](https://github.com/JeraldPascual/IRLMode)
+[![HTML](https://img.shields.io/badge/HTML-42.6%25-E34F26?logo=html5&logoColor=white)](https://github.com/JeraldPascual/IRLMode)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+A lightweight Manifest V3 Chrome extension that blocks any website with a full-page overlay. Supports permanent blocking and timer-based blocking with live countdown.
+
+</div>
 
 ---
 
@@ -17,33 +31,14 @@ Another site blocker and  lightweight Manifest V3 Chrome extension that blocks a
 
 ---
 
-## Project Structure
-
-```
-site-blocker-extension/
-├── manifest.json          # Extension manifest (MV3)
-├── content.js             # Injected into every page; renders the blocking overlay
-├── popup/
-│   ├── index.html         # Popup UI markup & styles
-│   └── popup.js           # Popup logic — add, remove, and list blocked sites
-├── icons/
-│   ├── icon16.png
-│   ├── icon32.png
-│   └── icon120.png
-└── fonts/
-    └── Chillax-Variable.ttf
-```
-
----
-
 ## Installation
 
 > Requires Google Chrome (or any Chromium-based browser).
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/JeraldPascual/site-blocker-extension.git
-   cd site-blocker-extension
+   git clone https://github.com/JeraldPascual/IRLMode.git
+   cd IRLMode
    ```
 
 2. **Open the Extensions page**
@@ -61,7 +56,7 @@ site-blocker-extension/
 
 ## Usage
 
-1. Click the **Site Blocker** icon in the Chrome toolbar
+1. Click the **IRLMode** icon in the Chrome toolbar
 2. Enter a domain in the input field (e.g. `reddit.com`, `youtube.com`, `x.com`)
 3. Choose a blocking mode:
    - **Permanent** — blocked indefinitely
@@ -75,6 +70,25 @@ To **remove a site**, click the × button next to its entry in the blocked list.
 
 ---
 
+## Project Structure
+
+```
+IRLMode/
+├── manifest.json          # Extension manifest (MV3)
+├── content.js             # Injected into every page; renders the blocking overlay
+├── popup/
+│   ├── index.html         # Popup UI markup & styles
+│   └── popup.js           # Popup logic — add, remove, and list blocked sites
+├── icons/
+│   ├── icon16.png
+│   ├── icon32.png
+│   └── icon120.png
+└── fonts/
+    └── Chillax-Variable.ttf
+```
+
+---
+
 ## How It Works
 
 ### `manifest.json`
@@ -82,7 +96,7 @@ To **remove a site**, click the × button next to its entry in the blocked list.
 Declares the extension with Manifest V3. Key permissions:
 
 | Permission | Purpose |
-|---|---|
+|------------|---------|
 | `storage` | Persist the blocked-sites list via `chrome.storage.sync` |
 | `scripting` | Programmatically inject `content.js` into the active tab |
 | `tabs` | Query and reload the active tab when needed |
@@ -116,7 +130,7 @@ Runs in the context of every visited page (injected via `content_scripts` at doc
 ## Domain Matching Rules
 
 | Input entered | Stored as | Matches |
-|---|---|---|
+|---------------|-----------|---------|
 | `reddit.com` | `reddit.com` | `reddit.com`, `old.reddit.com` |
 | `https://www.youtube.com/watch?v=xyz` | `youtube.com` | `youtube.com`, `m.youtube.com` |
 | `x.com` | `x.com` | `x.com` |
@@ -127,7 +141,7 @@ Runs in the context of every visited page (injected via `content_scripts` at doc
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+|-------|------------|
 | Extension platform | Chrome Extensions — Manifest V3 |
 | Storage | `chrome.storage.sync` |
 | Scripting | `chrome.scripting.executeScript` |
@@ -145,4 +159,11 @@ No build tools, no bundler, no frameworks.
 3. Commit your changes (`git commit -m 'feat: description'`)
 4. Push and open a pull request
 
+---
+
+<div align="center">
+
+**[Report Issues](https://github.com/JeraldPascual/IRLMode/issues)** • **[Discussions](https://github.com/JeraldPascual/IRLMode/discussions)**
+
+</div>
 
